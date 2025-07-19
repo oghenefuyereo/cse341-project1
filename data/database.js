@@ -11,28 +11,23 @@ const initDb = (callback) => {
     return callback(null, database);
   }
 
-  const uri = process.env.MONGODB_URI;
-  if (!uri) {
-    return callback(new Error("MONGODB_URI is not defined in .env"));
-  }
-
-  MongoClient.connect(uri)
+  MongoClient.connect(process.env.MONGODB_URL)
     .then((client) => {
-      database = client.db(); // uses the default DB from URI
-      // Removed duplicate console.log here
-      return callback(null, database);
+      database = client.db(); // Use the database object
+      console.log("Database connected.");
+      callback(null, database);
     })
     .catch((err) => callback(err));
 };
 
-const getDb = () => {
+const getDatabase = () => {
   if (!database) {
-    throw new Error("Database is not initialized!");
+    throw new Error('Database not initialized!');
   }
   return database;
 };
 
 module.exports = {
   initDb,
-  getDb,
+  getDatabase
 };
