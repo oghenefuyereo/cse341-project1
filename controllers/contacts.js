@@ -10,7 +10,7 @@ const getAll = async (req, res) => {
 };
 
 const getSingle = async (req, res) => {
-  const contactId = objectId(req.params.id);
+  const contactId = new objectId(req.params.id);
   const result = await mongodb
     .getDatabase()
     .db()
