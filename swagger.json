@@ -5,7 +5,7 @@
     "description": "Users API",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "cse341-project1-yjhh.onrender.com",
   "basePath": "/",
   "schemes": [
     "http",
