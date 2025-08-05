@@ -1,6 +1,11 @@
 const swaggerAutogen = require("swagger-autogen")();
 
-const host = process.env.HOST || "localhost:3000";
+const isProduction = process.env.NODE_ENV === "production";
+
+// Set host depending on environment
+const host = isProduction
+  ? "cse341-project1-yjhh.onrender.com"
+  : "localhost:3000";
 
 const doc = {
   info: {
@@ -8,7 +13,7 @@ const doc = {
     description: "Users API",
   },
   host: host,
-  schemes: host.includes("localhost") ? ["http"] : ["https"],
+  schemes: isProduction ? ["https"] : ["http"],
 };
 
 const outputFile = "./swagger.json";
