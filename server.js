@@ -12,6 +12,12 @@ app.use(express.json());
 // Register main routes
 app.use("/", require("./routes"));
 
+// Simple error handler middleware (must be after routes)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
+});
+
 // Start server after DB connection
 mongodb.initDb((err) => {
   if (err) {
@@ -26,10 +32,4 @@ mongodb.initDb((err) => {
       console.log(`Server running at ${host}`);
     });
   }
-});
-
-// Simple error handler middleware (optional)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
 });
