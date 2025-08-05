@@ -1,20 +1,22 @@
 const express = require("express");
+const cors = require("cors");
 const mongodb = require("./data/database");
-const app = express();
 
+const app = express();
 const port = process.env.PORT || 3000;
 
-// Use built-in JSON parser BEFORE routes
+app.use(cors());
 app.use(express.json());
 
 app.use("/", require("./routes"));
 
 mongodb.initDb((err) => {
   if (err) {
-    console.log(err);
+    console.error("Failed to connect to MongoDB:", err);
+    process.exit(1);
   } else {
     app.listen(port, () => {
-      console.log(`Database is listening and node Running on port ${port}`);
+      console.log(`Server running at http://localhost:${port}`);
     });
   }
 });

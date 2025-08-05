@@ -5,12 +5,14 @@ const doc = {
     title: "Users API",
     description: "Users API",
   },
-  host: "localhost:3000",
-  schemes: ["https", "http"],
+  host: process.env.HOST || "localhost:3000",
+  schemes: ["http", "https"],
 };
 
 const outputFile = "./swagger.json";
 const endpointsFiles = ["./routes/index.js"];
 
-// this will generate the swagger.json file
-swaggerAutogen(outputFile, endpointsFiles, doc);
+
+swaggerAutogen(outputFile, endpointsFiles, doc).then(() => {
+  require("./server"); 
+});
