@@ -1,98 +1,85 @@
-const { response } = require("express");
 const mongodb = require("../data/database");
 const objectId = require("mongodb").ObjectId;
 
 const getAll = async (req, res) => {
-  //#swagger.tags=['Users']
-  const result = await mongodb.getDatabase().db().collection("contacts").find();
-  result.toArray().then((contacts) => {
+  try {
+    const result = await mongodb.getDatabase().db().collection("contacts").find().toArray();
     res.setHeader("Content-Type", "application/json");
-    res.status(200).json(contacts);
-  });
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const getSingle = async (req, res) => {
-  //#swagger.tags=['Users']
-  const contactId = new objectId(req.params.id);
-  const result = await mongodb
-    .getDatabase()
-    .db()
-    .collection("contacts")
-    .find({ _id: contactId });
-  result.toArray().then((contacts) => {
+  try {
+    const contactId = new objectId(req.params.id);
+    const result = await mongodb.getDatabase().db().collection("contacts").findOne({ _id: contactId });
     res.setHeader("Content-Type", "application/json");
-    res.status(200).json(contacts[0]);
-  });
+    if (!result) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const createUser = async (req, res) => {
-  //#swagger.tags=['Users']
-  const contact = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    favouriteColor: req.body.favoriteColor,
-    birthday: req.body.birthday,
-  };
-  const result = await mongodb
-    .getDatabase()
-    .db()
-    .collection("contacts")
-    .insertOne(contact);
-  if (response.modifiedCount > 0) {
-    res.status(204).send();
-  } else {
-    res
-      .status(500)
-      .json(response || "Some error occurred while creating the contact.");
+  try {
+    const contact = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      favoriteColor: req.body.favoriteColor,  // match your API JSON key
+      birthday: req.body.birthday,
+    };
+    const result = await mongodb.getDatabase().db().collection("contacts").insertOne(contact);
+    if (result.insertedCount > 0) {
+      res.status(201).json({ message: "Contact created", id: result.insertedId });
+    } else {
+      res.status(500).json({ error: "Failed to create contact" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
 const updateUser = async (req, res) => {
-  //#swagger.tags=['Users']
-  const contactId = new objectId(req.params.id);
-  const contact = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    favouriteColor: req.body.favoriteColor,
-    birthday: req.body.birthday,
-  };
-  const result = await mongodb
-    .getDatabase()
-    .db()
-    .collection("contacts")
-    .replaceOne({ _id: contactId }, contact);
-  if (response.acknowledged > 0) {
-    res.status(204).send();
-  } else {
-    res
-      .status(500)
-      .json(response || "Some error occurred while creating the contact.");
+  try {
+    const contactId = new objectId(req.params.id);
+    const contact = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      favoriteColor: req.body.favoriteColor,
+      birthday: req.body.birthday,
+    };
+    const result = await mongodb.getDatabase().db().collection("contacts").replaceOne({ _id: contactId }, contact);
+    if (result.modifiedCount > 0) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ message: "Contact not found or no changes made" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
 const deleteUser = async (req, res) => {
-  //#swagger.tags=['Users']
-  const contactId = new objectId(req.params.id);
-  const contact = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    favouriteColor: req.body.favoriteColor,
-    birthday: req.body.birthday,
-  };
-  const result = await mongodb
-    .getDatabase()
-    .db()
-    .collection("contacts")
-    .remove({ _id: contactId }, true);
-  if (response.delectedcount > 0) {
-    res.status(204).send();
-  } else {
-    res.status(500).json(response || 'Some error occurred while creating the contact.');
-  };
+  try {
+    const contactId = new objectId(req.params.id);
+    const result = await mongodb.getDatabase().db().collection("contacts").deleteOne({ _id: contactId });
+    if (result.deletedCount > 0) {
+      res.status(204).send();
+    } else {
+      res.status(404).json({ message: "Contact not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
+
 module.exports = {
   getAll,
   getSingle,
